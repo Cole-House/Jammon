@@ -89,7 +89,43 @@ App to help users find new music and also for artists to find collaborators
 
 **Getting and prepping database for Rec System**
 
-- We can try to import user data similar to [receipting.com](http://receipting.com) using Spotify SDK API
+- We can try to import user data similar to [receiptify.com](http://receiptify.com) using Spotify SDK API
 - That will act as the baseline:
     - every action after that will help shape the recommendation engine
     - tracking browsing/listening history and later analyzing the data for correlations between different songs and music genres, and compare the user’s preferences to the entire user database.
+ 
+**Database Design**
+
+- Plan to use PostgreSQL as the database and store:
+1. **Users**
+    - **users** table
+    - Attributes: `id`, `username`, `email`, `password_hash`, `created_at`, `avatar_url` (optional), etc.
+2. **Songs**
+    - **songs** table
+    - Attributes: `id`, `title`, `artist_id`, `album_id`, `audio_url`, `duration`, `genre`, `release_date`, etc.
+    - You can also store high-level audio features (e.g., tempo, energy) if you have them. Alternatively, keep them in a separate table if you plan to handle more detailed analytics.
+3. **Artists**
+    - **artists** table
+    - Attributes: `id`, `name`, `description`, `genre`, etc.
+4. **Albums**
+    - **albums** table
+    - Attributes: `id`, `title`, `artist_id`, `release_date`, `cover_art_url`, etc.
+5. **Playlists**
+    - **playlists** table
+    - Attributes: `id`, `name`, `description`, `user_id` (the creator), `created_at`, `cover_art_url` (optional), etc.
+    - Relationship: One user can create many playlists; a playlist belongs to one user.
+6. **Playlist-Songs** (junction table for the many-to-many relationship)
+    - **playlist_songs** table
+    - Attributes: `playlist_id`, `song_id`, `added_at`, `position` (optional – for ordering), etc.
+    - You could combine `position` with a separate sort field or store ordering in an array if using NoSQL.
+7. **User Likes / Favorites**
+    - **user_likes** table
+    - Attributes: `user_id`, `song_id`, `created_at`, etc.
+    - This table captures songs a user “likes” or “favorites.”
+8. **User Listens / History**
+    - **user_listens** table
+    - Attributes: `user_id`, `song_id`, `played_at`, `device`, `listen_duration` (how many seconds listened), etc.
+    - Very useful for building a collaborative filtering dataset and generating recommendations.
+
+> Note on Uploading Music: You’ll need to store references to the uploaded files (possibly on a cloud storage like Amazon S3) in the songs table (audio_url). For legal music distribution, you’d typically also track who uploaded it, whether it’s an original track, licensing info, etc.
+>
