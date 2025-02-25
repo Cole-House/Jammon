@@ -1,6 +1,9 @@
 # Jammon
 App to help users find new music and also for artists to find collaborators 
 
+**Still in the planning stages...**
+
+Notes:
 **How Spotify Recommendation system works:**
 
 - Spotify’s recommendation system combines some of the best strategies from different types of models to create a powerful and comprehensive solution.
